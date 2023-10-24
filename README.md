@@ -1,2 +1,43 @@
-# methylseq_simulation
-Read-level methylome simulator 
+# Tumour-normal read-level methylation pattern and pseudo-bulk simulator
+
+Read-level methylome simulator using a beta-binomial distribution. 
+
+It currently supports only two cell-type simulations (tumour and normal).
+
+Pseudo-bulk samples with random cell-type compositions can be also simulated with the read-level methylomes. 
+
+## Quick start
+````
+python main.py --help
+usage: main.py [-h] [-d F_REGION] [-o OUTPUT_DIR] -r F_REF [--save_img]
+               [-ng N_REGIONS] [-nr N_READS] [-l LEN_READ] [--seed SEED]
+               [--bulk BULK] [-nb N_BULKS] [-s STD]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d F_REGION, --f_region F_REGION
+                        tab-separated .csv file, DMRs should be given with
+                        mean methylation level of each cell type, chr, start
+                        and end
+  -o OUTPUT_DIR, --output_dir OUTPUT_DIR
+                        a directory where all generated results will be saved
+  -r F_REF, --f_ref F_REF
+                        .fasta file for the reference genome
+  --save_img            Save simulated methylation patterns as a .png file
+  -ng N_REGIONS, --n_regions N_REGIONS
+                        Number of regions to select from CGIs when the region
+                        file is not given
+  -nr N_READS, --n_reads N_READS
+                        Read coverage to simulate in each DMR
+  -l LEN_READ, --len_read LEN_READ
+                        Read length to simulate
+  --seed SEED           seed number
+  --bulk BULK           Whether you want to generate pseudo-bulks or the
+                        entire dataset
+  -nb N_BULKS, --n_bulks N_BULKS
+                        Number of bulks, Applicable only when --bulk is True
+  -s STD, --std STD     Standard deviation to sample local proportions. The
+                        larger value is given, the more varying local
+                        proportions are sampled from a Gaussian distribution
+                        centred at the global proportion
+````
