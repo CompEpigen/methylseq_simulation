@@ -242,7 +242,7 @@ def read_simulation(f_ref: str,
 			fig, ax=plt.subplots(1, figsize=(30,5))
 			s=sns.heatmap(methyl_array, cmap=["white", "yellow", "black", "grey"], ax=ax)
 			ax.set_title("Region %d"%(i))
-			ax.hlines([int(n_reads/2)], colors="blue", xmin=0, xmax=methyl_array.shape[1])
+			ax.hlines([int(n_reads/2)-1], colors="blue", xmin=0, xmax=methyl_array.shape[1])
 			plt.tight_layout()
 			s.get_figure().savefig(os.path.join(region_dir,f"region_{i}.png"))    
 	
