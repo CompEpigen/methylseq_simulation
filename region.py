@@ -60,7 +60,7 @@ def sample_region_meth(regions: pd.DataFrame, a: float=1e-6, b: float=5.0,
 		ax.set_xlim(0,1)
 		ax.legend(loc='best', frameon=False)
 		plt.tight_layout()
-		fig.savefig(os.path.join(save_dir, "region_methyl_level_sampling.pdf"), format="pdf", dpi=300)
+		fig.savefig(os.path.join(save_dir, "region_methyl_level_sampling.png"), format="png", dpi=300)
 		plt.cla()
 		plt.close(fig)
 	else:

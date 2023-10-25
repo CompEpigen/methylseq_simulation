@@ -30,7 +30,7 @@ def test_simulation_plot(f_ref, output_dir, n_region):
 	reads = read_simulation(output_dir=output_dir, f_ref=f_ref, n_region=n_region, a=1, save_img=True)
 	assert len(reads["dmr_label"].unique()) == n_region
 	assert os.path.exists(output_dir)
-	assert os.path.exists(os.path.join(output_dir, "region_methyl_level_sampling.pdf"))
+	assert os.path.exists(os.path.join(output_dir, "region_methyl_level_sampling.png"))
 	assert os.path.exists(os.path.join(output_dir, "regions/"))
 	assert os.path.exists(os.path.join(output_dir, f"regions/region_{n_region-1}.png"))
 

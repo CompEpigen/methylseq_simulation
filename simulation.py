@@ -9,6 +9,7 @@ from Bio import SeqIO
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
 from tqdm import tqdm
 import pickle as pk
@@ -236,7 +237,7 @@ def read_simulation(f_ref: str,
 
 			assert (len(r_methyl) == len_read) and (len(r_seq) == len_read), f"length of methyl_seq and dna_seq are {len(r_methyl)} and {len(r_seq)}, respectively, although the given read length is {len_read}"			
 			if save_img:
-				methyl_array[r_idx, start-read_sample_start:(start+len_read-read_sample_start)] = r_methyl[1:-1]
+				methyl_array[r_idx, start-read_sample_start:(end-1-read_sample_start)] = r_methyl
 			
 			# K-mer
 			if k % 2 == 0:
@@ -260,10 +261,21 @@ def read_simulation(f_ref: str,
 
 		if save_img:
 
-			fig, ax=plt.subplots(1, figsize=(30,5))
-			s=sns.heatmap(methyl_array, cmap=["white", "yellow", "black", "grey"], ax=ax)
-			ax.set_title("Region %d"%(i))
-			ax.hlines([int(n_reads/2)+1], colors="blue", xmin=0, xmax=methyl_array.shape[1])
+			fig, ax=plt.subplots(1, figsize=(10,5))
+			s=sns.heatmap(methyl_array, 
+						  cmap=["white", "yellow", "black", "grey"], ax=ax, cbar=False,
+						  xticklabels=list(range(dmr["start"], dmr["end"])), yticklabels=False)
+			ax.set_title("Region %d (%s:%d-%d) sampled from meanMethy %.2f and %.2f"%(i, dmr["chr"], dmr["start"], dmr["end"], dmr["meanMethy1"], dmr["meanMethy2"]))
+			
+			for idx, t in enumerate(ax.get_xticklabels()):
+				if idx % 50 > 0:
+					t.set_visible(False)
+
+			legend_elements = [Line2D([0], [0], color='yellow', lw=4, label='unmethyl CG'),
+			                   Line2D([0], [0], color='black', lw=4, label='methyl CG')]
+			ax.legend(handles=legend_elements, loc='lower center', bbox_to_anchor=(.5, -.4), ncol=2)
+
+			ax.hlines([int(n_reads/2)+1], colors="blue", linestyle="--", xmin=0, xmax=methyl_array.shape[1])
 			plt.tight_layout()
 			s.get_figure().savefig(os.path.join(region_dir,f"region_{i}.png"))    
 	
