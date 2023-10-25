@@ -19,11 +19,11 @@ set_logger()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 	
-def _long_read_cpg_sample(r_start: int, r_end: int, r_seq: str, dmr):
+def _long_read_cpg_sample(r_start: int, r_seq: str, dmr):
 	cpg_loci = list()
 	before_dmr = 0
 	after_dmr = 0
-	for j in range(len(r_seq) - 2):
+	for j in range(len(r_seq) - 1):
 		if r_seq[j:j+2] == "CG":
 			cpg_loci.append(j)
 			if r_start + j < dmr["start"]: 
@@ -47,7 +47,7 @@ def bulk_simulation(reads: pd.DataFrame, n_bulks: int, output_dir : str, std: fl
 		Standard deviation of a Gaussian distribution to sample the number of reads in each region
 	'''
 
-	assert (n_bulks > 0) and (std > 0) f"n_bulks and std must be > 0 (given n_bulks={n_bulks}, std={std})"
+	assert (n_bulks > 0) and (std > 0), f"n_bulks and std must be > 0 (given n_bulks={n_bulks}, std={std})"
 
 	logger.info(f"Simulate {n_bulks} pseudo-bulk samples from the simulated reads")
 	ctypes = reads["ctype"].unique()
@@ -55,7 +55,7 @@ def bulk_simulation(reads: pd.DataFrame, n_bulks: int, output_dir : str, std: fl
 	
 	# Global cell-type proportions for n pseudo-bulk samples
 	pri_ratios = np.random.uniform(size=n_bulks)
-	bulk_names = ["bulk_%d"%i for i in range(n_bulks)]
+	bulk_names = ["bulk_%d"%(i+1) for i in range(n_bulks)]
 
 	post_ratios = list()
 
@@ -127,7 +127,7 @@ def read_simulation(f_ref: str,
 	'''
 
 	# Value range handling
-	assert (a > 0) and (b > 0) and (k > 0) and (n_reads >0) and (len_read>0) \
+	assert (a > 0) and (b > 0) and (k > 0) and (n_reads >0) and (len_read>0), \
 			f"a, b, k, n_reads, len_read must be > 0 (given a={a}, b={b}, k={k}, n_reads={n_reads}, len_read={len_read})"
 
 	# Setup random seed 
@@ -202,15 +202,15 @@ def read_simulation(f_ref: str,
 			r_ctype = "N" if r_idx > int(n_reads/2) else "T"
 
 			# read position
-			end = start + len_read + 2 # 2 for finding "CG" context
-			r_seq = dict_ref[dmr["chr"]][start:end]
+			end = start + len_read + 1 # for finding "CG" context, this will make (len_read + 1) length of sequence
+			r_seq = dict_ref[dmr["chr"]][start:end] # start considering 0-base 
 			
 			# Set probability based on mean methylation level for each cell type
 			p=dmr["meanMethy1"] if r_ctype=="T" else dmr["meanMethy2"]
 			
 			# Collect CpGs
 			if len_read > dmr_len:
-				cpg_loci, before_dmr, after_dmr = _long_read_cpg_sample(start, end, r_seq, dmr)
+				cpg_loci, before_dmr, after_dmr = _long_read_cpg_sample(start, r_seq, dmr)
 
 				# Simulate methylation patterns
 				m_patterns_1 = binom.rvs(n=1, p=non_dmr_mean_methy, size=before_dmr)
@@ -229,21 +229,26 @@ def read_simulation(f_ref: str,
 			r_methyl = list(np.ones(len(r_seq), dtype=int)*2)
 			for ri, rm in zip(cpg_loci, methyl_patterns):
 				r_methyl[ri] = rm
-			
+
+			# Remove the last one included for finding "CG" context
+			r_methyl = r_methyl[:-1]
+			r_seq = r_seq[:-1]
+
+			assert (len(r_methyl) == len_read) and (len(r_seq) == len_read), f"length of methyl_seq and dna_seq are {len(r_methyl)} and {len(r_seq)}, respectively, although the given read length is {len_read}"			
 			if save_img:
 				methyl_array[r_idx, start-read_sample_start:(start+len_read-read_sample_start)] = r_methyl[1:-1]
 			
 			# K-mer
+			if k % 2 == 0:
+				logger.warning(f"With an even number of K (K={k}), Cytosine methylation in CpG-context cannot be at the centre of each K-mer substring. CpG methylation pattern will given for the K-mer substring where CG is at the middle.")
+			
 			if k > 1:
-				if k % 2 == 1:
-					logger.warning(f"With an odd number of K (K={k}), CpG methylation patterns cannot be at the centre of each K-mer substring")
-				
-				seq_start, seq_end =  a//2 - int(a%2 == 0), a//2
+				seq_start, seq_end =  k//2 - int(k%2 == 0), k//2
 				r_methyl = "".join([str(r) for r in r_methyl[seq_start:-seq_end]])
 				r_seq = [r_seq[i:i+k] for i in range(len(r_seq)-(k-1))]
 				r_seq = " ".join(r_seq)
 			else:
-				r_methyl = "".join(r_methyl)
+				r_methyl = "".join([str(r) for r in r_methyl])
 
 			reads.append(pd.DataFrame({"dna_seq": [r_seq], 
 								 "methyl_seq": [r_methyl],

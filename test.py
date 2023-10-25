@@ -6,6 +6,16 @@ def test_simulation(f_ref, output_dir, n_region):
 	reads = read_simulation(output_dir=output_dir, f_ref=f_ref, n_region=n_region, a=1)
 	assert len(reads["dmr_label"].unique()) == n_region
 
+def test_k_mers(f_ref, output_dir, n_region, k):
+	reads = read_simulation(output_dir=output_dir, f_ref=f_ref, n_region=n_region, a=1, k=k)
+	if k > 1:
+		assert reads["dna_seq"].apply(lambda x: all([len(xx) == k for xx in x.split(" ")])).all()
+		assert (reads["methyl_seq"].apply(lambda x: len(x)) == reads["dna_seq"].apply(lambda x: len(x.split(" ")))).all()
+	else:
+		assert reads["dna_seq"].apply(lambda x: len(x)==150).all()
+		assert reads["methyl_seq"].apply(lambda x: len(x)==150).all()
+
+
 def test_simulation_long_read(f_ref, output_dir, n_region, read_len):
 	reads = read_simulation(output_dir=output_dir, f_ref=f_ref, n_region=n_region, a=1, len_read=read_len)
 	assert len(reads["dmr_label"].unique()) == n_region
@@ -39,12 +49,14 @@ def test_random_seed(f_ref, output_dir, n_region):
 
 
 if __name__=="__main__":
-	f_ref="/omics/groups/OE0219/internal/Yunhee/genome/hg19.fa"
+	f_ref="../genome/hg19.fa"
 	f_region="data/regions.csv"
 	output_dir="data/output/"
 	n_region=20
 
 	test_simulation(f_ref, output_dir, n_region=n_region)
+	for k in range(1,5):
+		test_k_mers(f_ref, output_dir, n_region=n_region, k=k)
 	test_simulation_long_read(f_ref, output_dir, n_region=n_region, read_len=500)
 	test_random_seed(f_ref, output_dir, n_region=n_region)
 	test_simulation_from_regions(f_ref, output_dir, f_region=f_region)
