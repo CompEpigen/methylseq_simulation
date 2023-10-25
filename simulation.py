@@ -47,6 +47,8 @@ def bulk_simulation(reads: pd.DataFrame, n_bulks: int, output_dir : str, std: fl
 		Standard deviation of a Gaussian distribution to sample the number of reads in each region
 	'''
 
+	assert (n_bulks > 0) and (std > 0) f"n_bulks and std must be > 0 (given n_bulks={n_bulks}, std={std})"
+
 	logger.info(f"Simulate {n_bulks} pseudo-bulk samples from the simulated reads")
 	ctypes = reads["ctype"].unique()
 	n_dmrs = len(reads["dmr_label"].unique())
@@ -91,6 +93,7 @@ def read_simulation(f_ref: str,
 			   n_region: int=1,
 			   a: float=1e-6,
 			   b: float=5.0, 
+			   k: int=1, 
 			   n_reads: int=120,
 			   len_read: int=150,
 			   save_img: bool=False,
@@ -108,6 +111,8 @@ def read_simulation(f_ref: str,
 		Number of regions to simulate read-level methylomes. Only applicable when f_region=None
 	a, b: float (default: 1e-6, 5.0)
 		alpha and beta parameters for the beta distribution
+	k : int (default: 1)
+		K to process the simulated read sequences into K-mer sequence
 	n_reads: int (default: 120)
 		Number of reads to simulate in each region
 	len_read: int (default: 150)
@@ -120,6 +125,10 @@ def read_simulation(f_ref: str,
 	return: pd.DataFrame
 		pandas DataFrame containing simulated read-level methylomes
 	'''
+
+	# Value range handling
+	assert (a > 0) and (b > 0) and (k > 0) and (n_reads >0) and (len_read>0) \
+			f"a, b, k, n_reads, len_read must be > 0 (given a={a}, b={b}, k={k}, n_reads={n_reads}, len_read={len_read})"
 
 	# Setup random seed 
 	set_seed(seed)
@@ -223,12 +232,19 @@ def read_simulation(f_ref: str,
 			
 			if save_img:
 				methyl_array[r_idx, start-read_sample_start:(start+len_read-read_sample_start)] = r_methyl[1:-1]
+			
+			# K-mer
+			if k > 1:
+				if k % 2 == 1:
+					logger.warning(f"With an odd number of K (K={k}), CpG methylation patterns cannot be at the centre of each K-mer substring")
+				
+				seq_start, seq_end =  a//2 - int(a%2 == 0), a//2
+				r_methyl = "".join([str(r) for r in r_methyl[seq_start:-seq_end]])
+				r_seq = [r_seq[i:i+k] for i in range(len(r_seq)-(k-1))]
+				r_seq = " ".join(r_seq)
+			else:
+				r_methyl = "".join(r_methyl)
 
-			r_methyl = "".join([str(r) for r in r_methyl[1:-1]])
-
-			# 3-mers
-			r_seq = [r_seq[i:i+3] for i in range(len(r_seq)-2)]
-			r_seq = " ".join(r_seq)
 			reads.append(pd.DataFrame({"dna_seq": [r_seq], 
 								 "methyl_seq": [r_methyl],
 								 "dmr_ctype":[dmr["ctype"]],
@@ -242,7 +258,7 @@ def read_simulation(f_ref: str,
 			fig, ax=plt.subplots(1, figsize=(30,5))
 			s=sns.heatmap(methyl_array, cmap=["white", "yellow", "black", "grey"], ax=ax)
 			ax.set_title("Region %d"%(i))
-			ax.hlines([int(n_reads/2)-1], colors="blue", xmin=0, xmax=methyl_array.shape[1])
+			ax.hlines([int(n_reads/2)+1], colors="blue", xmin=0, xmax=methyl_array.shape[1])
 			plt.tight_layout()
 			s.get_figure().savefig(os.path.join(region_dir,f"region_{i}.png"))    
 	
