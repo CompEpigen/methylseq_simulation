@@ -6,8 +6,43 @@ It currently supports only two cell-type simulations (tumour and normal).
 
 Pseudo-bulk samples with random cell-type compositions can be also simulated with the read-level methylomes. 
 
+## Set-up 
+_methylseq_simulation_ requires Python version > 3.6 (So far, it is tested under Python version 3.7 and 3.8).
+The dependencies are clarified in `requirements.txt`.
+
+#### pip installation
+If your environment (e.g. conda, Python venv and so on) is already activated, you can simply install the dependencies by `pip install -r requirements.txt`
+
+#### Conda environment
+[Conda](https://conda.io/projects/conda/en/latest/index.html) is a package and environment manager. 
+It helps you with managing software dependencies independently from your local system. 
+If you want to start conda, please find their installation guidance [here](https://docs.conda.io/projects/conda/en/23.1.x/user-guide/install/index.html).
+
+1. Create a new conda enviroment with a specific python version `conda creat -n $your_env_name python=$python_version`
+2. Install the dependencies by `pip install -r requirements.txt` 
+
+#### Python venv
+Python also supports a virtual environment. 
+
+1. Create a Python virtual environment by `python -m venv $your_directory_path`
+2. Activate the virtual environment by `source $your_directory_path/bin/activate`
+3. Install dependencies by `pip install -r requirements.txt`
+
+#### pip error handling 
+If you get a version-related error message as below:
+```
+Could not find a version that satisfies the requirement numpy==1.21.4
+(from versions: 1.14.5, 1.14.6, 1.15.0, 1.15.1, 1.15.2, 1.15.3, 1.15.4,
+1.16.0, 1.16.1, 1.16.2, 1.16.3, 1.16.4, 1.16.5, 1.16.6, 1.17.0, 1.17.1,
+1.17.2, 1.17.3, 1.17.4, 1.17.5, 1.18.0, 1.18.1, 1.18.2, 1.18.3, 1.18.4,
+1.18.5, 1.19.0, 1.19.1, 1.19.2, 1.19.3, 1.19.4, 1.19.5, 1.20.0, 1.20.1,
+1.20.2, 1.20.3, 1.21.0, 1.21.1, 1.21.2, 1.21.3)
+```
+You may want to upgrade your `pip` by `pip install --upgrade pip`
 
 ## Quick start
+You can simulate read-level methylomes and pseudo-bulk samples (with `--bulk` option) by running `main.py` as below:
+
 ````
 python main.py --help
 usage: main.py [-h] -r F_REF [-d F_REGION] [-o OUTPUT_DIR] [--save_img]
@@ -55,6 +90,8 @@ optional arguments:
 
 ````
 ## Output example 
+If `--save_img` option is on, you can get the summary of results as figures in the designated `output_dir`. 
+
 #### Sampled region-wise methylation level
 <img src="data/output/region_methyl_level_sampling.png" width="500">
 
