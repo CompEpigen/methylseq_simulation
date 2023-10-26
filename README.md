@@ -28,6 +28,13 @@ Python also supports a virtual environment.
 2. Activate the virtual environment by `source $your_directory_path/bin/activate`
 3. Install dependencies by `pip install -r requirements.txt`
 
+#### Docker
+[Docker](https://www.docker.com/resources/what-container/#:~:text=A%20Docker%20container%20image%20is,tools%2C%20system%20libraries%20and%20settings.) also provides resources to manage environment called _container_. We provide `Dockerfile` to run the simulator with the required dependencies.
+
+1. Build a docker container by `sudo docker build -t methylseq_simulation .`
+2. Run the container by `sudo docker run -i -t methylseq_simulation /bin/bash`
+3. You can use the command line as described in **Quick start**
+
 #### pip error handling 
 If you get a version-related error message as below:
 ```
