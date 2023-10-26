@@ -7,7 +7,7 @@ It currently supports only two cell-type simulations (tumour and normal).
 Pseudo-bulk samples with random cell-type compositions can be also simulated with the read-level methylomes. 
 
 ## Set-up 
-_methylseq_simulation_ requires Python version > 3.6 (So far, it is tested under Python version 3.7 and 3.8).
+_methylseq_simulation_ requires Python version > 3.6 (So far, it has been tested under Python version 3.7, 3.8 and 3.9).
 The dependencies are clarified in `requirements.txt`.
 
 #### pip installation
@@ -18,7 +18,7 @@ If your environment (e.g. conda, Python venv and so on) is already activated, yo
 It helps you with managing software dependencies independently from your local system. 
 If you want to start conda, please find their installation guidance [here](https://docs.conda.io/projects/conda/en/23.1.x/user-guide/install/index.html).
 
-1. Create a new conda enviroment with a specific python version `conda creat -n $your_env_name python=$python_version`
+1. Create a new conda environment with a specific python version `conda creat -n $your_env_name python=$python_version`
 2. Install the dependencies by `pip install -r requirements.txt` 
 
 #### Python venv
@@ -49,7 +49,7 @@ You may want to upgrade your `pip` by `pip install --upgrade pip`
 
 ## Input files
 The simulator requires a reference genome FASTA file (such as hg19.fa) to simulate the reads. 
-You can download various genome sequences from [UCSC](https://hgdownload.soe.ucsc.edu/downloads.html#hg38sequence) as a gziped FASTA file. 
+You can download various genome sequences from [UCSC](https://hgdownload.soe.ucsc.edu/downloads.html#hg38sequence) as a gzipped FASTA file. 
 
 If you have a specific set of regions you want to simulate reads, you can give the file name with `-d` option. 
 The file must be tab-separated and include chromosome, start and end information with _chr_, _start_ and _end_ for column names. 
