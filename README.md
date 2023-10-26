@@ -47,6 +47,13 @@ Could not find a version that satisfies the requirement numpy==1.21.4
 ```
 You may want to upgrade your `pip` by `pip install --upgrade pip`
 
+## Input files
+The simulator requires a reference genome FASTA file (such as hg19.fa) to simulate the reads. 
+You can download various genome sequences from [UCSC](https://hgdownload.soe.ucsc.edu/downloads.html#hg38sequence) as a gziped FASTA file. 
+
+If you have a specific set of regions you want to simulate reads, you can give the file name with `-d` option. 
+The file must be tab-separated and include chromosome, start and end information with _chr_, _start_ and _end_ for column names. 
+
 ## Quick start
 You can simulate read-level methylomes and pseudo-bulk samples (with `--bulk` option) by running `main.py` as below:
 
