@@ -37,8 +37,8 @@ def test_simulation_plot(f_ref, output_dir, n_region):
 def test_simulation_bulk(f_ref, output_dir, n_region, n_bulks):
 	reads = read_simulation(output_dir=output_dir, f_ref=f_ref, n_region=n_region, a=1, save_img=True)
 	bulk_simulation(reads=reads, n_bulks=n_bulks, output_dir=output_dir, std=0)
-	assert os.path.exists(os.path.join(output_dir, f"bulk_{n_bulks-1}.txt"))
-	assert os.path.exists(os.path.join(output_dir, "bulk_cell_type_proportions.csv"))
+	assert os.path.exists(os.path.join(output_dir, f"bulk_{n_bulks}.txt")), f"{output_dir} {n_bulks}"
+	assert os.path.exists(os.path.join(output_dir, "bulk_cell_type_proportions.csv")), f"{output_dir} {n_bulks}"
 
 def test_random_seed(f_ref, output_dir, n_region):
 	reads_1 = read_simulation(output_dir=output_dir, f_ref=f_ref, n_region=n_region, a=1, save_img=True, seed=42)
@@ -54,6 +54,7 @@ if __name__=="__main__":
 	output_dir="data/output/"
 	n_region=20
 
+	
 	test_simulation(f_ref, output_dir, n_region=n_region)
 	for k in range(1,5):
 		test_k_mers(f_ref, output_dir, n_region=n_region, k=k)

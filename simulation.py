@@ -48,7 +48,7 @@ def bulk_simulation(reads: pd.DataFrame, n_bulks: int, output_dir : str, std: fl
 		Standard deviation of a Gaussian distribution to sample the number of reads in each region
 	'''
 
-	assert (n_bulks > 0) and (std > 0), f"n_bulks and std must be > 0 (given n_bulks={n_bulks}, std={std})"
+	assert (n_bulks > 0) and (std >= 0), f"n_bulks and std must be > 0 (given n_bulks={n_bulks}, std={std})"
 
 	logger.info(f"Simulate {n_bulks} pseudo-bulk samples from the simulated reads")
 	ctypes = reads["ctype"].unique()
@@ -171,6 +171,10 @@ def read_simulation(f_ref: str,
 		logger.error("Regions must be a dataframe with chr, start and end columns")
 
 	reads = list()
+
+	if k % 2 == 0:
+		logger.warning(f"With an even number of K (K={k}), Cytosine methylation in CpG-context cannot be at the centre of each K-mer substring. CpG methylation pattern will given for the K-mer substring where CG is at the middle.")
+		
 	for i in tqdm(range(df_regions.shape[0])):
 
 		dmr = df_regions.iloc[i,:]
@@ -240,8 +244,6 @@ def read_simulation(f_ref: str,
 				methyl_array[r_idx, start-read_sample_start:(end-1-read_sample_start)] = r_methyl
 			
 			# K-mer
-			if k % 2 == 0:
-				logger.warning(f"With an even number of K (K={k}), Cytosine methylation in CpG-context cannot be at the centre of each K-mer substring. CpG methylation pattern will given for the K-mer substring where CG is at the middle.")
 			
 			if k > 1:
 				seq_start, seq_end =  k//2 - int(k%2 == 0), k//2
