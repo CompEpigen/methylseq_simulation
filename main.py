@@ -34,6 +34,9 @@ def arg_parser():
 if __name__=="__main__":
 	args = arg_parser()
 	
+	if not os.path.exists(args.output_dir):
+		os.mkdir(args.output_dir)
+
 
 	# Save hyperparameters - TODO: make it config
 	pd.DataFrame({"param":vars(args).keys(),
@@ -45,7 +48,7 @@ if __name__=="__main__":
 			   n_region=args.n_regions,
 			   a=args.a,
 			   b=args.b, 
-			   k=args.k,
+			   k=args.k_mer,
 			   n_reads=args.n_reads,
 			   len_read=args.len_read,
 			   save_img=args.save_img,
