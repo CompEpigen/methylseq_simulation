@@ -1,4 +1,5 @@
 # Tumour-normal read-level methylation pattern and pseudo-bulk simulator
+[![DOI](https://zenodo.org/badge/708769539.svg)](https://doi.org/10.5281/zenodo.14025024)
 
 Read-level methylome simulator using a beta-binomial distribution. 
 
